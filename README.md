@@ -11,25 +11,25 @@
 
 ## ⚡ Overview
 
-This project demonstrates the sheer power of **Pydantic V2** combined with an agentic web search workflow. By enforcing strict JSON schemas on the local `granite4.1:3b` model, we guarantee that the synthesized research reports are robust, perfectly structured, and ready to be downloaded via a stunning Streamlit UI.
+This project demonstrates the sheer power of **Pydantic V2** combined with an agentic web search workflow. By passing the Pydantic JSON schema to the local `granite4.1:3b` model (Ollama structured outputs) and validating the result, we guarantee that the synthesized research reports are robust, perfectly structured, and ready to be downloaded via a stunning Streamlit UI.
 
 ## 🛠️ Tech Stack
 - **Pydantic V2**: Strict schema definition, validation, and JSON generation.
 - **Streamlit**: Beautiful, rapid web interface.
 - **Ollama**: Local AI inference using `granite4.1:3b` (zero-cost, fast).
-- **DuckDuckGo Search**: Real-time web context gathering.
+- **DuckDuckGo Search** (`ddgs` package): Real-time web context gathering.
 
 ### 📁 File Explanations
-- `app.py`: The main Streamlit web application. It handles the UI, invokes DuckDuckGo for web searches, formats the prompt for Ollama, and displays the final Markdown report.
-- `models.py`: Contains the `ResearchReport` Pydantic V2 schema. It enforces strict type validation and utilizes `@field_validator` to automatically clean up the LLM's text output.
-- `requirements.txt`: Python package dependencies.
-- `output.md` / `ideal_outputs.md`: Sample generated markdown reports produced by the tool.
+- `app.py`: The main Streamlit web application. It handles the UI, invokes DuckDuckGo for web searches, sends the prompt and the JSON schema to Ollama, and displays the final Markdown report.
+- `models.py`: Contains the `ResearchReport` Pydantic V2 schema. It enforces strict type validation (3–5 key findings, non-empty fields) and uses `@field_validator` to clean up the LLM's text output.
+- `requirements.txt`: Python package dependencies (`requirements-dev.txt` adds pytest).
+- `tests/`: Unit tests for the schema and the Ollama call (no Ollama or network needed).
 
 ---
 
 ## 🚀 Installation & Setup
 
-Copy and paste these commands into your Windows AntiGravity PowerShell:
+Run these commands in a terminal:
 
 ### 1. Start Ollama & Download Model
 Ensure you have Ollama installed on your system. Run the following command to download the model and ensure the server is running:
@@ -43,7 +43,7 @@ ollama run granite4.1:3b
 pip install -r requirements.txt
 ```
 
-### 2. Run the Application
+### 3. Run the Application
 ```powershell
 streamlit run app.py
 ```
@@ -52,7 +52,13 @@ streamlit run app.py
 
 ## 🧪 Testing
 
-To quickly test the Pydantic generation pipeline without the UI:
+Run the unit tests (no Ollama needed):
+```powershell
+pip install -r requirements-dev.txt
+pytest
+```
+
+To test the real Pydantic generation pipeline against Ollama, without the UI:
 ```powershell
 python -c "from app import generate_report; print(generate_report('AI Agents', 'AI Agents are autonomous entities.').model_dump_json(indent=2))"
 ```
